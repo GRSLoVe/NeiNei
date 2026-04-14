@@ -1,7 +1,21 @@
 services:
-  web:
+  app:
     build: .
-    image: hojas-estudio:local
+    image: neinei:local
     ports:
-      - "8080:80"
+      - "8080:3000"
+    environment:
+      DATA_DIR: /data
+      PUBLIC_DIR: /app/public
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-false}
+    volumes:
+      - neinei-data:/data
     restart: unless-stopped
+
+volumes:
+  neinei-data:

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mi perfil — Hojas de estudio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    (function(){try{var t=localStorage.getItem('neinei-theme');if(t==null)return;var m=window.matchMedia('(prefers-color-scheme: dark)');var r=t==='dark'?'dark':t==='light'?'light':(m.matches?'dark':'light');document.documentElement.setAttribute('data-theme',r);}catch(e){}})();
+  </script>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-page auth-page-wide">
+    <div class="auth-brand">
+      <h1>Mi perfil</h1>
+      <p class="auth-tagline">Personaliza cómo te ves en la app y tus datos de acceso.</p>
+    </div>
+    <div class="login-panel auth-card" id="profile-card">
+      <p class="auth-muted" id="profile-loading">Cargando…</p>
+      <div id="profile-content" hidden>
+        <section class="profile-section">
+          <h2 class="auth-card-title">Foto de perfil</h2>
+          <p class="auth-muted">JPEG, PNG o WebP · máx. 2 MB. Visible en la barra superior junto a tu apodo.</p>
+          <div class="profile-avatar-row">
+            <div class="profile-avatar-frame">
+              <img id="profile-avatar-preview" class="profile-avatar-img" alt="" width="96" height="96" hidden />
+              <span id="profile-avatar-placeholder" class="profile-avatar-placeholder" aria-hidden="true">Sin foto</span>
+            </div>
+            <div class="profile-avatar-actions">
+              <input id="avatar-file" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="visually-hidden" />
+              <button type="button" class="btn-secondary" id="btn-avatar-pick">Elegir imagen…</button>
+              <button type="button" class="btn-secondary" id="btn-avatar-remove" hidden>Quitar foto</button>
+            </div>
+          </div>
+          <p class="login-error" id="avatar-msg" role="status"></p>
+        </section>
+        <section class="profile-section">
+          <h2 class="auth-card-title">Personalización</h2>
+          <p class="auth-muted">Correo con el que inicias sesión</p>
+          <p class="profile-email" id="profile-email"></p>
+          <p class="auth-muted">Identificador interno (solo lectura)</p>
+          <p class="profile-username" id="profile-username"></p>
+          <form id="form-personal">
+            <fieldset class="profile-theme-fieldset">
+              <legend class="profile-theme-legend">Tema</legend>
+              <p class="auth-muted profile-theme-hint">Claro, oscuro o el mismo que tu sistema.</p>
+              <div class="profile-theme-options">
+                <label class="profile-theme-option"><input type="radio" id="theme-pref-light" name="theme-pref" value="light" /> Claro</label>
+                <label class="profile-theme-option"><input type="radio" id="theme-pref-dark" name="theme-pref" value="dark" /> Oscuro</label>
+                <label class="profile-theme-option"><input type="radio" id="theme-pref-system" name="theme-pref" value="system" /> Automático (sistema)</label>
+              </div>
+            </fieldset>
+            <div class="login-field">
+              <label for="display-name">Apodo (nombre visible)</label>
+              <input id="display-name" name="display_name" type="text" maxlength="100" autocomplete="nickname" placeholder="Cómo te mostramos en la app" />
+            </div>
+            <div class="login-field">
+              <label for="profile-bio">Sobre ti / nota</label>
+              <textarea id="profile-bio" name="profile_bio" class="profile-textarea" rows="3" maxlength="500" placeholder="Opcional. Aparece al pasar el cursor sobre tu nombre en las hojas."></textarea>
+            </div>
+            <div class="login-field">
+              <label for="accent-color">Color principal (botones Guardar, etc.)</label>
+              <div class="profile-color-row">
+                <input id="accent-color" name="accent_color" type="color" value="#15803d" aria-label="Elegir color" />
+                <button type="button" class="btn-secondary" id="btn-accent-default">Color por defecto</button>
+              </div>
+            </div>
+            <div class="login-actions">
+              <button type="submit" class="btn-primary">Guardar personalización</button>
+            </div>
+            <p class="login-error" id="personal-msg" role="status"></p>
+          </form>
+        </section>
+        <section class="profile-section">
+          <h2 class="auth-card-title">Contraseña</h2>
+          <form id="form-password">
+            <div class="login-field">
+              <label for="pw-current">Contraseña actual</label>
+              <input id="pw-current" name="current_password" type="password" autocomplete="current-password" required />
+            </div>
+            <div class="login-field">
+              <label for="pw-new">Nueva contraseña</label>
+              <input id="pw-new" name="new_password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" />
+            </div>
+            <div class="login-field">
+              <label for="pw-new2">Repetir nueva</label>
+              <input id="pw-new2" name="new_password_confirm" type="password" autocomplete="new-password" required minlength="8" />
+            </div>
+            <div class="login-actions">
+              <button type="submit" class="btn-primary">Cambiar contraseña</button>
+            </div>
+            <p class="login-error" id="pw-msg" role="status"></p>
+          </form>
+        </section>
+        <nav class="profile-nav">
+          <a class="btn-secondary auth-inline-link" href="/app.html">Volver a las hojas</a>
+          <button type="button" class="btn-secondary" id="btn-profile-logout">Cerrar sesión</button>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="/js/profile-page.js"></script>
+</body>
+</html>

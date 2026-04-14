@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iniciar sesión — Hojas de estudio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    (function(){try{var t=localStorage.getItem('neinei-theme');if(t==null)return;var m=window.matchMedia('(prefers-color-scheme: dark)');var r=t==='dark'?'dark':t==='light'?'light':(m.matches?'dark':'light');document.documentElement.setAttribute('data-theme',r);}catch(e){}})();
+  </script>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-page">
+    <div class="auth-brand">
+      <h1>Hojas de estudio</h1>
+      <p class="auth-tagline">Entra con tu correo y contraseña: verás solo tus hojas guardadas en este servidor.</p>
+    </div>
+    <div class="login-panel auth-card">
+      <h2 class="auth-card-title">Acceso</h2>
+      <p class="auth-muted" id="login-banner" hidden role="status"></p>
+      <form id="login-form">
+        <div class="login-field">
+          <label for="login-email">Correo electrónico</label>
+          <input id="login-email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="login-field">
+          <label for="login-pass">Contraseña</label>
+          <input id="login-pass" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="btn-primary" id="login-submit">Entrar</button>
+        </div>
+        <p class="login-error" id="login-error" role="alert"></p>
+      </form>
+      <p class="auth-footer-links">
+        <a href="/app.html?local=1" id="link-local">Solo este navegador</a>
+        <span class="auth-dot" aria-hidden="true">·</span>
+        <a href="/register.html" id="link-register">Crear cuenta nueva</a>
+      </p>
+      <p class="auth-login-hint" id="register-hint" role="status"></p>
+    </div>
+  </main>
+  <script type="module" src="/js/login-page.js"></script>
+</body>
+</html>

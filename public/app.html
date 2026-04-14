@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hojas de estudio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    (function(){try{var t=localStorage.getItem('neinei-theme');if(t==null)return;var m=window.matchMedia('(prefers-color-scheme: dark)');var r=t==='dark'?'dark':t==='light'?'light':(m.matches?'dark':'light');document.documentElement.setAttribute('data-theme',r);}catch(e){}})();
+  </script>
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/js/neinei-editor.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="app-shell" class="app-shell is-locked">
+  <header class="app-header">
+    <h1>Hojas de estudio</h1>
+    <span class="status-pill" id="status-pill" title="">Borrador (no guardado)</span>
+    <div class="user-bar" id="user-bar" hidden>
+      <img id="user-avatar" class="user-bar-avatar" alt="" width="28" height="28" hidden />
+      <span id="user-display"></span>
+      <a class="btn-secondary auth-inline-link" href="/profile.html">Mi perfil</a>
+      <button type="button" class="btn-secondary" id="btn-import-local" hidden>Importar desde navegador</button>
+      <button type="button" class="btn-secondary" id="btn-logout">Salir</button>
+    </div>
+    <div class="header-editor-tools" id="header-editor-tools">
+      <details class="plantillas-panel" id="plantillas-details">
+        <summary class="plantillas-summary" id="plantillas-summary" aria-label="Elegir plantilla">Plantilla: <strong id="plantillas-label">Concepto</strong></summary>
+        <div class="plantillas-list" role="list">
+          <button type="button" class="plantilla-opt" data-plantilla="concepto" role="listitem">Concepto</button>
+          <button type="button" class="plantilla-opt" data-plantilla="ejercicio" role="listitem">Ejercicio</button>
+          <button type="button" class="plantilla-opt" data-plantilla="error" role="listitem">Error</button>
+          <button type="button" class="plantilla-opt" data-plantilla="resumen" role="listitem">Resumen</button>
+        </div>
+      </details>
+      <div class="actions">
+        <button type="button" class="btn-secondary" id="btn-modo-foco" title="Modo foco (menos distracciones)">Foco</button>
+        <button type="button" class="btn-secondary" id="btn-export-json">Exportar JSON</button>
+        <button type="button" class="btn-secondary" id="btn-import-json">Importar JSON</button>
+        <input type="file" id="input-import-json" accept="application/json,.json" hidden />
+        <button type="button" class="btn-secondary" id="btn-galeria">Galería</button>
+        <button type="button" class="btn-primary" id="btn-guardar">Guardar</button>
+        <button type="button" class="btn-secondary" id="btn-personalizar-apartados">Personalizar apartados</button>
+        <button type="button" class="btn-secondary" id="btn-nueva">Nueva hoja</button>
+        <button type="button" class="btn-secondary" id="btn-nav-stats">Progreso</button>
+        <button type="button" class="btn-secondary" id="btn-nav-review">Repasar</button>
+        <button type="button" class="btn-secondary" id="btn-nav-errors">Mis errores</button>
+        <button type="button" class="btn-secondary" id="btn-biblioteca">Mis hojas</button>
+        <button type="button" class="btn-secondary" id="btn-volver-nota" disabled title="Volver a la hoja en la que estabas antes de seguir un enlace [[…]] (Alt+flecha izquierda)">← Hoja anterior</button>
+        <button type="button" class="btn-print" id="btn-print">Imprimir</button>
+        <button type="button" class="btn-pdf" id="btn-pdf">Exportar a PDF</button>
+      </div>
+    </div>
+    <div class="header-library-tools" id="header-library-tools" hidden>
+      <button type="button" class="btn-primary" id="btn-volver-editor">Volver al editor</button>
+      <span class="library-header-title">Mis hojas</span>
+    </div>
+    <div class="header-extra-tools" id="header-extra-tools" hidden>
+      <button type="button" class="btn-primary" id="btn-extra-volver-editor">Volver al editor</button>
+      <span class="header-extra-title" id="header-extra-title"></span>
+    </div>
+  </header>
+
+  <div id="view-editor" title="Enlaces: escribe [[ y elige hoja; Ctrl+clic (⌘ en Mac) en [[…]] para abrirla. «← Hoja anterior» o Alt+flecha izquierda para volver.">
+  <div class="preview-wrap">
+    <div class="sheet-page" data-print-meta="1">
+    <div class="sheet-meta sheet-page-meta" id="editor-meta">
+      <div class="meta-field">
+        <label for="editor-meta-titulo">Título</label>
+        <input type="text" id="editor-meta-titulo" name="hoja_titulo" class="meta-input" data-meta="titulo" placeholder="Título de la hoja" autocomplete="off" />
+      </div>
+      <div class="meta-field">
+        <label for="editor-meta-materia">Materia</label>
+        <input type="text" id="editor-meta-materia" name="hoja_materia" class="meta-input" data-meta="materia" placeholder="Ej. Cálculo I" autocomplete="off" />
+      </div>
+      <div class="meta-field">
+        <label for="editor-meta-fecha">Fecha</label>
+        <input type="date" id="editor-meta-fecha" name="hoja_fecha" class="meta-input" data-meta="fecha" />
+      </div>
+      <div class="meta-field meta-field-error-type" id="meta-error-type-wrap" hidden>
+        <label for="meta-error-type">Tipo de error (análisis)</label>
+        <select id="meta-error-type" class="meta-select" name="meta_error_type" autocomplete="off">
+          <option value="">Sin clasificar</option>
+          <option value="concepto">Concepto</option>
+          <option value="procedimiento">Procedimiento</option>
+          <option value="signos">Signos</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="meta-field meta-field-tags meta-field-full">
+        <label for="tags-input">Etiquetas</label>
+        <div class="tags-editor" id="tags-editor-wrap">
+          <div class="tags-chips" id="tags-chips" aria-live="polite"></div>
+          <input type="text" id="tags-input" class="tags-input" list="tags-suggestions" placeholder="Escribe y pulsa Enter" autocomplete="off" />
+          <datalist id="tags-suggestions"></datalist>
+        </div>
+      </div>
+      <div class="meta-field meta-field-full backlinks-wrap" id="backlinks-wrap">
+        <div class="backlinks-label">Referenciada en</div>
+        <ul class="backlinks-list" id="backlinks-list"></ul>
+        <p class="backlinks-empty" id="backlinks-empty" hidden>Ninguna otra hoja enlaza aquí aún (usa <code>[[título]]</code> en el texto).</p>
+      </div>
+    </div>
+    <div class="sheet-meta-print" id="sheet-meta-print" aria-hidden="true">
+      <div class="print-rec-main" id="print-rec-main"></div>
+      <div class="print-rec-sub" id="print-rec-sub"></div>
+    </div>
+    <!-- 1 Concepto -->
+    <section data-sheet="concepto" class="is-active" aria-label="Hoja de concepto">
+      <article class="sheet" id="sheet-concepto">
+        <h2 class="sheet-title">Hoja de concepto</h2>
+        <div class="sheet-block" data-sheet-block="concepto.tema">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Tema</div>
+            <div class="box lined lined-short"><textarea id="f-concepto-tema" name="concepto.tema" class="field-input" data-f="concepto.tema" rows="2" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="concepto.idea_principal">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Idea principal</div>
+            <div class="box lined" style="min-height:4.5em"><textarea id="f-concepto-idea_principal" name="concepto.idea_principal" class="field-input" data-f="concepto.idea_principal" rows="3" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="concepto.formula_clave">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Fórmula clave</div>
+            <div class="box lined" style="min-height:4.5em"><textarea id="f-concepto-formula_clave" name="concepto.formula_clave" class="field-input" data-f="concepto.formula_clave" rows="3" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="concepto.explicacion_simple">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Explicación simple</div>
+            <div class="box lined lined-tall"><textarea id="f-concepto-explicacion_simple" name="concepto.explicacion_simple" class="field-input" data-f="concepto.explicacion_simple" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="concepto.condiciones">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Condiciones</div>
+            <p class="field-hint-latex" id="hint-concepto-condiciones">Editor con LaTeX (resaltado, vista previa y snippets). Usa <code>$…$</code>, <code>\(…\)</code>, bloques <code>$$…$$</code> o <code>\[…\]</code>.</p>
+            <div class="box lined box-math-editor" style="min-height:6em" role="group" aria-labelledby="hint-concepto-condiciones">
+              <textarea id="f-concepto-condiciones" name="concepto.condiciones"
+                class="field-input"
+                data-f="concepto.condiciones"
+                rows="5"
+                spellcheck="true"
+                placeholder="Ej.: &quot;x &gt; 0&quot; y fórmulas como $x^2$ o \(\lim_{n\to\infty} a_n\)"
+                aria-label="Condiciones del concepto, con soporte LaTeX"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="concepto.error_comun">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Error común</div>
+            <div class="box lined" style="min-height:6em"><textarea id="f-concepto-error_comun" name="concepto.error_comun" class="field-input" data-f="concepto.error_comun" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="concepto.ejemplo">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Ejemplo</div>
+            <div class="box lined" style="min-height:7em"><textarea id="f-concepto-ejemplo" name="concepto.ejemplo" class="field-input" data-f="concepto.ejemplo" rows="6" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="concepto.intuicion">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Intuición</div>
+            <div class="box lined" style="min-height:6em"><textarea id="f-concepto-intuicion" name="concepto.intuicion" class="field-input" data-f="concepto.intuicion" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 2 Ejercicio -->
+    <section data-sheet="ejercicio" aria-label="Hoja de ejercicio">
+      <article class="sheet" id="sheet-ejercicio">
+        <h2 class="sheet-title">Hoja de ejercicio</h2>
+        <div class="sheet-block" data-sheet-block="ejercicio.numero">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Número de ejercicio</div>
+            <div class="box lined lined-short"><textarea id="f-ejercicio-numero" name="ejercicio.numero" class="field-input" data-f="ejercicio.numero" rows="2" spellcheck="false"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.tema">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Tema</div>
+            <div class="box lined lined-short"><textarea id="f-ejercicio-tema" name="ejercicio.tema" class="field-input" data-f="ejercicio.tema" rows="2" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.que_piden">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Qué me piden</div>
+            <div class="box lined" style="min-height:3.6em"><textarea id="f-ejercicio-que_piden" name="ejercicio.que_piden" class="field-input" data-f="ejercicio.que_piden" rows="3" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.datos_clave">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Datos clave</div>
+            <div class="box lined" style="min-height:4.5em"><textarea id="f-ejercicio-datos_clave" name="ejercicio.datos_clave" class="field-input" data-f="ejercicio.datos_clave" rows="4" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.plan">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Plan</div>
+            <div class="box lined" style="min-height:5.5em"><textarea id="f-ejercicio-plan" name="ejercicio.plan" class="field-input" data-f="ejercicio.plan" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.resolucion">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Resolución (pasos)</div>
+            <div class="box lined" style="min-height:12em"><textarea id="f-ejercicio-resolucion" name="ejercicio.resolucion" class="field-input" data-f="ejercicio.resolucion" rows="10" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.resultado">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Resultado</div>
+            <div class="box lined" style="min-height:4.5em"><textarea id="f-ejercicio-resultado" name="ejercicio.resultado" class="field-input" data-f="ejercicio.resultado" rows="4" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.verificacion">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Verificación</div>
+            <div class="box lined" style="min-height:4.5em"><textarea id="f-ejercicio-verificacion" name="ejercicio.verificacion" class="field-input" data-f="ejercicio.verificacion" rows="4" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.err">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Tipo de error</div>
+            <div class="box error-types" data-err-group>
+              <label><input type="checkbox" id="ejercicio-err-0" name="ejercicio_err_0" data-f="ejercicio.err" data-err-i="0" /> Lectura del enunciado</label>
+              <label><input type="checkbox" id="ejercicio-err-1" name="ejercicio_err_1" data-f="ejercicio.err" data-err-i="1" /> Concepto / fórmula</label>
+              <label><input type="checkbox" id="ejercicio-err-2" name="ejercicio_err_2" data-f="ejercicio.err" data-err-i="2" /> Cálculo algebraico</label>
+              <label><input type="checkbox" id="ejercicio-err-3" name="ejercicio_err_3" data-f="ejercicio.err" data-err-i="3" /> Aritmético</label>
+              <label><input type="checkbox" id="ejercicio-err-4" name="ejercicio_err_4" data-f="ejercicio.err" data-err-i="4" /> Unidades / notación</label>
+              <label><input type="checkbox" id="ejercicio-err-5" name="ejercicio_err_5" data-f="ejercicio.err" data-err-i="5" /> Otro</label>
+            </div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.tiempo_inicio">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Tiempo de inicio</div>
+            <div class="box lined lined-short"><textarea id="f-ejercicio-tiempo_inicio" name="ejercicio.tiempo_inicio" class="field-input" data-f="ejercicio.tiempo_inicio" rows="2" spellcheck="false"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.tiempo_fin">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Tiempo de finalización</div>
+            <div class="box lined lined-short"><textarea id="f-ejercicio-tiempo_fin" name="ejercicio.tiempo_fin" class="field-input" data-f="ejercicio.tiempo_fin" rows="2" spellcheck="false"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="ejercicio.apoyo">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Cómo lo resolví</div>
+            <div class="box error-types apoyo-opciones">
+              <label><input type="checkbox" id="ejercicio-apoyo-chatgpt" name="ejercicio_apoyo_chatgpt" data-apoyo="chatgpt" autocomplete="off" /> Con ayuda de ChatGPT</label>
+              <label><input type="checkbox" id="ejercicio-apoyo-solo" name="ejercicio_apoyo_solo" data-apoyo="solo" autocomplete="off" /> Sin ayuda</label>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 3 Error -->
+    <section data-sheet="error" aria-label="Hoja de error">
+      <article class="sheet" id="sheet-error">
+        <h2 class="sheet-title">Hoja de error</h2>
+        <div class="sheet-block" data-sheet-block="error.ejercicio_ref">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Ejercicio donde fallé</div>
+            <div class="box lined lined-short"><textarea id="f-error-ejercicio_ref" name="error.ejercicio_ref" class="field-input" data-f="error.ejercicio_ref" rows="2" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="error.que_hice_mal">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Qué hice mal</div>
+            <div class="box lined" style="min-height:5em"><textarea id="f-error-que_hice_mal" name="error.que_hice_mal" class="field-input" data-f="error.que_hice_mal" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="error.porque">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Por qué lo hice mal</div>
+            <div class="box lined" style="min-height:5em"><textarea id="f-error-porque" name="error.porque" class="field-input" data-f="error.porque" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="error.como_bien">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Cómo se hacía bien</div>
+            <div class="box lined" style="min-height:8em"><textarea id="f-error-como_bien" name="error.como_bien" class="field-input" data-f="error.como_bien" rows="7" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="error.regla">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Regla aprendida</div>
+            <div class="box lined" style="min-height:5em"><textarea id="f-error-regla" name="error.regla" class="field-input" data-f="error.regla" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="error.ejercicio_similar">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Ejercicio similar</div>
+            <div class="box lined" style="min-height:14em"><textarea id="f-error-ejercicio_similar" name="error.ejercicio_similar" class="field-input" data-f="error.ejercicio_similar" rows="12" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 4 Resumen -->
+    <section data-sheet="resumen" aria-label="Hoja resumen">
+      <article class="sheet" id="sheet-resumen">
+        <h2 class="sheet-title">Hoja resumen</h2>
+        <div class="sheet-block" data-sheet-block="resumen.tema">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Tema</div>
+            <div class="box lined lined-short"><textarea id="f-resumen-tema" name="resumen.tema" class="field-input" data-f="resumen.tema" rows="2" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="resumen.formulas">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Fórmulas clave</div>
+            <div class="box lined" style="min-height:8em"><textarea id="f-resumen-formulas" name="resumen.formulas" class="field-input" data-f="resumen.formulas" rows="7" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="resumen.casos">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Casos importantes</div>
+            <div class="box lined" style="min-height:7em"><textarea id="f-resumen-casos" name="resumen.casos" class="field-input" data-f="resumen.casos" rows="6" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="resumen.trucos">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Trucos</div>
+            <div class="box lined" style="min-height:6em"><textarea id="f-resumen-trucos" name="resumen.trucos" class="field-input" data-f="resumen.trucos" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="resumen.errores_evitar">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Errores a evitar</div>
+            <div class="box lined" style="min-height:6em"><textarea id="f-resumen-errores_evitar" name="resumen.errores_evitar" class="field-input" data-f="resumen.errores_evitar" rows="5" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+        <div class="sheet-block" data-sheet-block="resumen.ejemplo_tipico">
+          <div class="field">
+            <div class="field-label" data-sheet-block-label>Ejemplo típico</div>
+            <div class="box lined" style="min-height:15em"><textarea id="f-resumen-ejemplo_tipico" name="resumen.ejemplo_tipico" class="field-input" data-f="resumen.ejemplo_tipico" rows="13" spellcheck="true"></textarea></div>
+          </div>
+        </div>
+      </article>
+    </section>
+    </div>
+  </div>
+  </div>
+
+  <div id="view-library" class="view-library" hidden>
+    <div class="library-inner">
+      <div class="library-filters">
+        <label><span>Fecha desde</span><input type="date" id="filtro-desde" name="filtro_desde" /></label>
+        <label><span>Fecha hasta</span><input type="date" id="filtro-hasta" name="filtro_hasta" /></label>
+        <label><span>Título contiene</span><input type="text" id="filtro-titulo" name="filtro_titulo" placeholder="Texto..." autocomplete="off" /></label>
+        <label><span>Materia contiene</span><input type="text" id="filtro-materia" name="filtro_materia" placeholder="Texto..." autocomplete="off" /></label>
+        <label><span>Tipo</span>
+          <select id="filtro-tipo" name="filtro_tipo">
+            <option value="">Todos</option>
+            <option value="concepto">Concepto</option>
+            <option value="ejercicio">Ejercicio</option>
+            <option value="error">Error</option>
+            <option value="resumen">Resumen</option>
+          </select>
+        </label>
+        <label class="filter-full"><span>Buscar en el contenido</span><input type="text" id="filtro-contenido" name="filtro_contenido" placeholder="Ej. límites, ej. 12…" autocomplete="off" /></label>
+        <label class="filter-full"><span>Etiquetas (todas deben coincidir; separa con coma)</span><input type="text" id="filtro-tags" name="filtro_tags" placeholder="ej. álgebra, límites" autocomplete="off" /></label>
+      </div>
+      <ul class="library-list" id="library-list"></ul>
+    </div>
+  </div>
+
+  <div id="view-review" class="view-panel view-review" hidden>
+    <div class="view-panel-inner">
+      <p class="view-panel-lead">Hojas con <strong>siguiente repaso</strong> hoy o antes. Evalúa cómo te fue; el intervalo crece si dominas la idea.</p>
+      <ul class="review-list" id="review-list" aria-live="polite"></ul>
+      <p class="view-panel-empty" id="review-empty" hidden>No hay hojas pendientes de repaso. ¡Buen ritmo!</p>
+    </div>
+  </div>
+
+  <div id="view-stats" class="view-panel view-stats" hidden>
+    <div class="view-panel-inner">
+      <div class="stats-grid" id="stats-grid"></div>
+      <p class="view-panel-error" id="stats-error" hidden>No se pudieron cargar las estadísticas (¿solo navegador?).</p>
+    </div>
+  </div>
+
+  <div id="view-errors" class="view-panel view-errors" hidden>
+    <div class="view-panel-inner">
+      <p class="view-panel-lead">Hojas de tipo <strong>Error</strong>, agrupadas para ver patrones.</p>
+      <div class="errors-groups" id="errors-groups"></div>
+    </div>
+  </div>
+
+  <dialog class="dialog-layout" id="dialog-layout">
+    <div class="dialog-layout-inner">
+      <h2 class="dialog-layout-title">Personalizar apartados</h2>
+      <p class="dialog-layout-hint">Mostrar u ocultar, renombrar, reordenar o añadir apartados de texto. Los cambios se guardan al pulsar «Guardar» en la hoja.</p>
+      <div class="dialog-layout-print-option">
+        <label class="dialog-layout-print-label">
+          <input type="checkbox" id="dialog-layout-print-meta" checked />
+          Incluir cabecera al imprimir o en PDF (título, materia y fecha)
+        </label>
+      </div>
+      <ul class="dialog-layout-list" id="dialog-layout-list"></ul>
+      <div class="dialog-layout-actions-row">
+        <button type="button" class="btn-secondary" id="dialog-layout-add">Añadir apartado de texto</button>
+        <button type="button" class="btn-secondary" id="dialog-layout-reset">Restaurar predeterminado</button>
+      </div>
+      <div class="dialog-layout-footer">
+        <button type="button" class="btn-primary" id="dialog-layout-apply">Aplicar</button>
+        <button type="button" class="btn-secondary" id="dialog-layout-cancel">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="dialog-search" id="dialog-search">
+    <div class="dialog-search-inner">
+      <h2 class="dialog-search-title">Buscar hoja</h2>
+      <input type="search" class="dialog-search-input" id="dialog-search-input" placeholder="Título, materia, contenido…" autocomplete="off" />
+      <ul class="dialog-search-results" id="dialog-search-results" role="listbox"></ul>
+      <p class="dialog-search-hint"><kbd>Ctrl</kbd>+<kbd>K</kbd> · Esc cierra</p>
+    </div>
+  </dialog>
+
+  <dialog class="dialog-gallery" id="dialog-gallery">
+    <div class="dialog-gallery-inner">
+      <h2 class="dialog-gallery-title">Galería de imágenes</h2>
+      <p class="dialog-gallery-hint">Sube imágenes con un alias único para luego usarlas en el texto con <code>![[alias|600]]</code>.</p>
+      <form class="dialog-gallery-upload" id="gallery-upload-form">
+        <div class="dialog-gallery-row">
+          <label class="dialog-gallery-label" for="gallery-alias">Alias</label>
+          <input id="gallery-alias" class="dialog-gallery-input" type="text" placeholder="ej: interseccion-9-4" autocomplete="off" />
+        </div>
+        <div class="dialog-gallery-row">
+          <label class="dialog-gallery-label" for="gallery-title">Título (opcional)</label>
+          <input id="gallery-title" class="dialog-gallery-input" type="text" placeholder="Ej: Intersección (9,4)" autocomplete="off" />
+        </div>
+        <div class="dialog-gallery-row">
+          <input id="gallery-file" type="file" accept="image/jpeg,image/png,image/webp" hidden />
+          <button type="button" class="btn-secondary" id="btn-gallery-pick">Elegir imagen…</button>
+          <button type="submit" class="btn-primary" id="btn-gallery-upload">Subir</button>
+        </div>
+        <p class="dialog-gallery-msg" id="gallery-msg" aria-live="polite"></p>
+      </form>
+      <div class="dialog-gallery-list-wrap">
+        <div class="dialog-gallery-list-head">
+          <strong>Mis imágenes</strong>
+          <button type="button" class="btn-secondary" id="btn-gallery-refresh">Actualizar</button>
+        </div>
+        <div class="dialog-gallery-grid">
+          <ul class="dialog-gallery-list" id="gallery-list"></ul>
+          <aside class="dialog-gallery-preview" id="gallery-preview" hidden>
+            <img class="dialog-gallery-preview-img" id="gallery-preview-img" alt="" />
+            <div class="dialog-gallery-preview-meta">
+              <div class="dialog-gallery-row dialog-gallery-row-compact">
+                <label class="dialog-gallery-label" for="gallery-edit-alias">Alias</label>
+                <input id="gallery-edit-alias" class="dialog-gallery-input" type="text" autocomplete="off" />
+              </div>
+              <div class="dialog-gallery-row dialog-gallery-row-compact">
+                <label class="dialog-gallery-label" for="gallery-edit-title">Título</label>
+                <input id="gallery-edit-title" class="dialog-gallery-input" type="text" autocomplete="off" />
+              </div>
+              <div class="dialog-gallery-preview-actions">
+                <button type="button" class="btn-secondary" id="btn-gallery-insert">Insertar en campo</button>
+                <button type="button" class="btn-secondary" id="btn-gallery-copy">Copiar embed</button>
+                <button type="button" class="btn-primary" id="btn-gallery-save">Guardar cambios</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+      <div class="dialog-gallery-footer">
+        <button type="button" class="btn-secondary" id="btn-gallery-close">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="wiki-link-preview" class="wiki-link-preview" hidden role="tooltip"></div>
+  <button type="button" class="fab-nueva" id="fab-nueva" title="Nueva hoja (Ctrl+N)">+</button>
+
+  <dialog class="dialog-pick-tipo" id="dialog-pick-tipo">
+    <div class="dialog-pick-tipo-inner">
+      <h2 class="dialog-pick-tipo-title">Tipo de hoja nueva</h2>
+      <p class="dialog-pick-tipo-hint">Cada hoja usa una sola plantilla.</p>
+      <div class="dialog-pick-tipo-grid">
+        <button type="button" class="btn-secondary pick-tipo-btn" data-new-tipo="concepto">Concepto</button>
+        <button type="button" class="btn-secondary pick-tipo-btn" data-new-tipo="ejercicio">Ejercicio</button>
+        <button type="button" class="btn-secondary pick-tipo-btn" data-new-tipo="error">Error</button>
+        <button type="button" class="btn-secondary pick-tipo-btn" data-new-tipo="resumen">Resumen</button>
+      </div>
+      <button type="button" class="btn-secondary dialog-pick-tipo-cancel" id="dialog-pick-cancel">Cancelar</button>
+    </div>
+  </dialog>
+  </div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

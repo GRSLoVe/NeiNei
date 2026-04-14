@@ -1,0 +1,22 @@
+{
+  "name": "neinei-editor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build --config ./vite.config.ts",
+    "watch": "vite build --watch --config ./vite.config.ts"
+  },
+  "dependencies": {
+    "@codemirror/language": "^6.12.3",
+    "@codemirror/legacy-modes": "^6.5.2",
+    "codemirror": "^6.0.2",
+    "js-base64": "^3.7.7",
+    "katex": "^0.16.21",
+    "prismjs": "^1.30.0",
+    "valibot": "^0.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^6.3.5"
+  }
+}

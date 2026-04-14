@@ -13,3 +13,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# API local
+api/data/
+
+# Bundle del editor (dependencias locales)
+editor/node_modules/

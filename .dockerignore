@@ -1,6 +1,6 @@
+api/node_modules
+node_modules
 .git
-.gitignore
+.env
 *.md
 docs
-.env
-.DS_Store

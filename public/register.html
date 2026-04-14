@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crear cuenta — Hojas de estudio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    (function(){try{var t=localStorage.getItem('neinei-theme');if(t==null)return;var m=window.matchMedia('(prefers-color-scheme: dark)');var r=t==='dark'?'dark':t==='light'?'light':(m.matches?'dark':'light');document.documentElement.setAttribute('data-theme',r);}catch(e){}})();
+  </script>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-page">
+    <div class="auth-brand">
+      <h1>Nueva cuenta</h1>
+      <p class="auth-tagline">Nuevo usuario en el servidor (correo distinto al tuyo anterior). Cuenta distinta de «perfil»: el perfil (nombre, bio) se edita dentro de la app ya logueado.</p>
+    </div>
+    <div class="login-panel auth-card" id="register-card">
+      <h2 class="auth-card-title">Registro</h2>
+      <p class="auth-muted" id="register-closed" hidden>El registro público está <strong>desactivado</strong> en este servidor. El administrador debe poner <code class="auth-code">ALLOW_REGISTRATION=true</code> en el entorno (por ejemplo <code class="auth-code">.env</code>) y reiniciar el servicio. Mientras tanto, <a href="/login.html">vuelve al acceso</a> con una cuenta ya existente.</p>
+      <form id="register-form" hidden>
+        <div class="login-field">
+          <label for="reg-email">Correo electrónico</label>
+          <input id="reg-email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="login-field">
+          <label for="reg-pass">Contraseña</label>
+          <input id="reg-pass" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" />
+        </div>
+        <div class="login-field">
+          <label for="reg-pass2">Repetir contraseña</label>
+          <input id="reg-pass2" name="password2" type="password" autocomplete="new-password" required minlength="8" />
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="btn-primary">Crear cuenta</button>
+          <a class="btn-secondary auth-inline-link" href="/login.html">Ya tengo cuenta</a>
+        </div>
+        <p class="login-error" id="register-error" role="alert"></p>
+      </form>
+    </div>
+  </main>
+  <script type="module" src="/js/register-page.js"></script>
+</body>
+</html>
