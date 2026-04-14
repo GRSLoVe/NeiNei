@@ -1,5 +1,9 @@
 # Hojas de estudio (NeiNei)
 
+<p align="center">
+  <img src="public/Logos/Nei2.jpg" alt="NeiNei" width="520" />
+</p>
+
 Plantillas A4 (concepto, ejercicio, error, resumen), campos editables, impresión y PDF. Los datos pueden guardarse en **SQLite** en el servidor tras un **login** de un solo usuario, o solo en el navegador si eliges «Solo este navegador» o no hay API disponible.
 
 ## Stack

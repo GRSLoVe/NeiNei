@@ -1236,14 +1236,34 @@
     .box-cm-editor .md-math-block {
       margin: 0.35rem 0 0.5rem;
       text-align: center;
-      overflow-x: auto;
+      /* Evitar barras de scroll en KaTeX (h/v). */
+      overflow: visible !important;
+      max-width: 100%;
+    }
+
+    .box-cm-editor .md-math-block .katex-display {
+      overflow: visible !important;
+      max-width: 100%;
+    }
+
+    .box-cm-editor .md-math-block .katex {
+      max-width: 100%;
     }
 
     .box-cm-editor .math-block-external-previews .math-block-preview-below {
-      overflow-x: auto;
+      /* Evitar barras de scroll en preview debajo. */
+      overflow: visible !important;
       max-width: 100%;
       margin-top: 0.4rem;
       text-align: center;
+    }
+
+    /* Defensa extra: algunos browsers meten scrollbar si hay overflow auto. */
+    .box-cm-editor .md-math-block::-webkit-scrollbar,
+    .box-cm-editor .md-math-block .katex-display::-webkit-scrollbar,
+    .box-cm-editor .math-block-external-previews .math-block-preview-below::-webkit-scrollbar {
+      width: 0;
+      height: 0;
     }
 
     .box-cm-editor .math-block-external-previews .math-block-preview-below:first-child {
@@ -1789,6 +1809,35 @@
       max-width: 380px;
       padding: 1.25rem 1.35rem;
       border: 1px solid var(--border);
+    }
+
+    .auth-logo {
+      display: block;
+      max-width: 260px;
+      width: 100%;
+      height: auto;
+      margin: 0 0 0.65rem;
+      filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.12));
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      text-decoration: none;
+      color: inherit;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      flex: 0 0 auto;
+      border-radius: 8px;
+    }
+
+    .brand-text {
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
     }
 
     .login-panel h2 {

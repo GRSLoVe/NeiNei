@@ -10,6 +10,9 @@
   <script>
     (function(){try{var t=localStorage.getItem('neinei-theme');if(t==null)return;var m=window.matchMedia('(prefers-color-scheme: dark)');var r=t==='dark'?'dark':t==='light'?'light':(m.matches?'dark':'light');document.documentElement.setAttribute('data-theme',r);}catch(e){}})();
   </script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#2563eb" />
   <link rel="stylesheet" href="/css/app.css" />
   <link rel="stylesheet" href="/js/neinei-editor.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
@@ -17,7 +20,10 @@
 <body>
   <div id="app-shell" class="app-shell is-locked">
   <header class="app-header">
-    <h1>Hojas de estudio</h1>
+    <a class="brand-link" href="/app.html" aria-label="NeiNei">
+      <img class="brand-logo" src="/Logos/neinei-mark.svg" width="28" height="28" alt="" />
+      <span class="brand-text">NeiNei</span>
+    </a>
     <span class="status-pill" id="status-pill" title="">Borrador (no guardado)</span>
     <div class="user-bar" id="user-bar" hidden>
       <img id="user-avatar" class="user-bar-avatar" alt="" width="28" height="28" hidden />

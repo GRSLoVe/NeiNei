@@ -10,12 +10,15 @@
   <script>
     (function(){try{var t=localStorage.getItem('neinei-theme');if(t==null)return;var m=window.matchMedia('(prefers-color-scheme: dark)');var r=t==='dark'?'dark':t==='light'?'light':(m.matches?'dark':'light');document.documentElement.setAttribute('data-theme',r);}catch(e){}})();
   </script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#2563eb" />
   <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body class="auth-body">
   <main class="auth-page">
     <div class="auth-brand">
-      <h1>Nueva cuenta</h1>
+      <img class="auth-logo" src="/Logos/neinei-logo.svg" alt="NeiNei" width="260" height="70" />
       <p class="auth-tagline">Nuevo usuario en el servidor (correo distinto al tuyo anterior). Cuenta distinta de «perfil»: el perfil (nombre, bio) se edita dentro de la app ya logueado.</p>
     </div>
     <div class="login-panel auth-card" id="register-card">
